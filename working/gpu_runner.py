@@ -39,8 +39,7 @@ def main():
           
         if k is None or k <= 1:  
             # Flujo single-split  
-            cfg, NNClass, params, dataset, train_data, val_data, test_idx = \  
-                load_experiment(exp_name, repeat_index=rep_index)  
+            cfg, NNClass, params, dataset, train_data, val_data, test_idx = load_experiment(exp_name, repeat_index=rep_index)  
               
             # Verificar si ya existe  
             rep_report = BASE_DIR / cfg['experiment']['output_root'] / cfg['experiment']['output_subdir'] / "reports" / "classification_report.json"  
@@ -76,8 +75,7 @@ def main():
             for fold in range(k):  
                 print(f"🔄 Rep {rep_index+1} Fold {fold+1} en GPU {gpu_id}")  
                   
-                cfg, NNClass, params, dataset, train_data, val_data, test_idx = \  
-                    load_experiment(exp_name, repeat_index=rep_index, fold_index=fold)  
+                cfg, NNClass, params, dataset, train_data, val_data, test_idx = load_experiment(exp_name, repeat_index=rep_index, fold_index=fold)  
                   
                 # Verificar si ya existe  
                 rep_report = BASE_DIR / cfg['experiment']['output_root'] / cfg['experiment']['output_subdir'] / "reports" / "classification_report.json"  
