@@ -160,17 +160,16 @@ class BaseTFModel:
             for old_ckpt in ckpt_files[:-1]:
                 old_ckpt.unlink()
                 print(" "*10, f"🗑️ Eliminado checkpoint: {old_ckpt.name}")
-class DistributedBaseTFModel(BaseTFModel):  
-    def __init__(self, config: dict, **model_params):  
-        # Configurar estrategia distribuida ANTES de crear el modelo  
-        self.strategy = tf.distribute.MirroredStrategy()  
-        print(f"🔄 Usando {self.strategy.num_replicas_in_sync} GPUs con MirroredStrategy")  
-          
-        # Inicializar dentro del scope de la estrategia  
-        with self.strategy.scope():  
-            super().__init__(config, **model_params)  
-      
-    def fit(self, train_data, val_data):  
-        # El entrenamiento se distribuye automáticamente  
-        with self.strategy.scope():  
-            return super().fit(train_data, val_data)
+class DistributedBaseTFModel(BaseTFModel):    
+    def __init__(self, config: dict, strategy=None, **model_params):    
+        # Use provided strategy or create default  
+        self.strategy = strategy or tf.distribute.get_strategy()  
+        print(f"🔄 Usando {self.strategy.num_replicas_in_sync} GPUs con MirroredStrategy")    
+            
+        # Inicializar dentro del scope de la estrategia    
+        with self.strategy.scope():    
+            super().__init__(config, **model_params)    
+        
+    def fit(self, train_data, val_data):    
+        # El entrenamiento se distribuye automáticamente    
+        return super().fit(train_data, val_data)  # Remove nested scope
