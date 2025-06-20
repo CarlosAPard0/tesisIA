@@ -4,20 +4,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStoppi
 from pathlib import Path
 from tensorflow.keras.losses import CategoricalCrossentropy
 import datetime
-class DistributedBaseTFModel(BaseTFModel):  
-    def __init__(self, config: dict, **model_params):  
-        # Configurar estrategia distribuida ANTES de crear el modelo  
-        self.strategy = tf.distribute.MirroredStrategy()  
-        print(f"🔄 Usando {self.strategy.num_replicas_in_sync} GPUs con MirroredStrategy")  
-          
-        # Inicializar dentro del scope de la estrategia  
-        with self.strategy.scope():  
-            super().__init__(config, **model_params)  
-      
-    def fit(self, train_data, val_data):  
-        # El entrenamiento se distribuye automáticamente  
-        with self.strategy.scope():  
-            return super().fit(train_data, val_data)
+
 class EpochLoggerCallback(tf.keras.callbacks.Callback):
     def __init__(self, log_freq=5, timestamp_format='%d-%m-%Y %H:%M:%S'):
         super().__init__()
@@ -173,3 +160,17 @@ class BaseTFModel:
             for old_ckpt in ckpt_files[:-1]:
                 old_ckpt.unlink()
                 print(" "*10, f"🗑️ Eliminado checkpoint: {old_ckpt.name}")
+class DistributedBaseTFModel(BaseTFModel):  
+    def __init__(self, config: dict, **model_params):  
+        # Configurar estrategia distribuida ANTES de crear el modelo  
+        self.strategy = tf.distribute.MirroredStrategy()  
+        print(f"🔄 Usando {self.strategy.num_replicas_in_sync} GPUs con MirroredStrategy")  
+          
+        # Inicializar dentro del scope de la estrategia  
+        with self.strategy.scope():  
+            super().__init__(config, **model_params)  
+      
+    def fit(self, train_data, val_data):  
+        # El entrenamiento se distribuye automáticamente  
+        with self.strategy.scope():  
+            return super().fit(train_data, val_data)
